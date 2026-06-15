@@ -1,0 +1,20 @@
+# Temp files
+*.json.tmp
+nb_payload.json
+pl_payload.json
+pl_create.json
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/

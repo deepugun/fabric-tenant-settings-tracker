@@ -1,0 +1,75 @@
+{
+  "properties": {
+    "description": "Runs the Tenant Settings Change Tracker notebook daily and sends email alerts via Outlook when changes are detected.",
+    "activities": [
+      {
+        "name": "Run_Settings_Tracker",
+        "type": "TridentNotebook",
+        "dependsOn": [],
+        "policy": {
+          "timeout": "0.02:00:00",
+          "retry": 1,
+          "retryIntervalInSeconds": 60,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "typeProperties": {
+          "notebookId": "<NOTEBOOK_ID>",
+          "workspaceId": "<WORKSPACE_ID>"
+        }
+      },
+      {
+        "name": "Check_For_Changes",
+        "type": "IfCondition",
+        "dependsOn": [
+          {
+            "activity": "Run_Settings_Tracker",
+            "dependencyConditions": ["Succeeded"]
+          }
+        ],
+        "typeProperties": {
+          "expression": {
+            "type": "Expression",
+            "value": "@json(activity('Run_Settings_Tracker').output.result.exitValue).has_changes"
+          },
+          "ifTrueActivities": [
+            {
+              "name": "Send_Change_Alert_Email",
+              "type": "Office365Email",
+              "dependsOn": [],
+              "typeProperties": {
+                "to": "<YOUR_EMAIL>",
+                "subject": "@json(activity('Run_Settings_Tracker').output.result.exitValue).subject",
+                "body": "@json(activity('Run_Settings_Tracker').output.result.exitValue).body_html",
+                "importance": "High",
+                "operationType": "SendEmail"
+              },
+              "externalReferences": {
+                "connection": "<OUTLOOK_CONNECTION_ID>"
+              }
+            }
+          ],
+          "ifFalseActivities": [
+            {
+              "name": "Log_No_Changes",
+              "type": "SetVariable",
+              "dependsOn": [],
+              "typeProperties": {
+                "variableName": "pipelineReturnValue",
+                "value": {
+                  "pipelineReturnValue": [
+                    {
+                      "key": "status",
+                      "value": "No changes detected"
+                    }
+                  ]
+                },
+                "setSystemVariable": true
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
