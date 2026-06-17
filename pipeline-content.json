@@ -75,14 +75,12 @@
               "dependsOn": [],
               "typeProperties": {
                 "variableName": "pipelineReturnValue",
-                "value": {
-                  "pipelineReturnValue": [
-                    {
-                      "key": "status",
-                      "value": "No changes detected"
-                    }
-                  ]
-                },
+                "value": [
+                  {
+                    "key": "status",
+                    "value": "No changes detected"
+                  }
+                ],
                 "setSystemVariable": true
               }
             }
