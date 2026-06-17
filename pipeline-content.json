@@ -1,6 +1,11 @@
 {
   "properties": {
     "description": "Runs the Tenant Settings Change Tracker notebook daily and sends email alerts via Outlook when changes are detected.",
+    "variables": {
+      "emailSubject": {
+        "type": "String"
+      }
+    },
     "activities": [
       {
         "name": "Run_Settings_Tracker",
@@ -34,12 +39,26 @@
           },
           "ifTrueActivities": [
             {
-              "name": "Send_Change_Alert_Email",
-              "type": "Office365Email",
+              "name": "Set_Email_Subject",
+              "type": "SetVariable",
               "dependsOn": [],
               "typeProperties": {
+                "variableName": "emailSubject",
+                "value": "@json(activity('Run_Settings_Tracker').output.result.exitValue).subject"
+              }
+            },
+            {
+              "name": "Send_Change_Alert_Email",
+              "type": "Office365Email",
+              "dependsOn": [
+                {
+                  "activity": "Set_Email_Subject",
+                  "dependencyConditions": ["Succeeded"]
+                }
+              ],
+              "typeProperties": {
                 "to": "<YOUR_EMAIL>",
-                "subject": "@json(activity('Run_Settings_Tracker').output.result.exitValue).subject",
+                "subject": "@variables('emailSubject')",
                 "body": "@json(activity('Run_Settings_Tracker').output.result.exitValue).body_html",
                 "importance": "High",
                 "operationType": "SendEmail"
