@@ -4,6 +4,9 @@
     "variables": {
       "emailSubject": {
         "type": "String"
+      },
+      "pipelineStatus": {
+        "type": "String"
       }
     },
     "activities": [
@@ -74,14 +77,8 @@
               "type": "SetVariable",
               "dependsOn": [],
               "typeProperties": {
-                "variableName": "pipelineReturnValue",
-                "value": [
-                  {
-                    "key": "status",
-                    "value": "No changes detected"
-                  }
-                ],
-                "setSystemVariable": true
+                "variableName": "pipelineStatus",
+                "value": "No changes detected"
               }
             }
           ]
